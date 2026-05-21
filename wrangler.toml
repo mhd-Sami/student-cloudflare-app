@@ -1,4 +1,4 @@
-name = "student-form-app"
+name = "student-cloudflare-app"
 
 main = "worker.js"
 
@@ -7,4 +7,4 @@ compatibility_date = "2026-05-21"
 [[d1_databases]]
 binding = "DB"
 database_name = "student-db"
-database_id = "YOUR_DATABASE_ID"
+database_id = "TEMP_ID"
