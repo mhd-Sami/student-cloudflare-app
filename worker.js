@@ -111,6 +111,10 @@ async function saveStudent() {
     })
   });
 
+  document.getElementById("name").value = "";
+  document.getElementById("email").value = "";
+  document.getElementById("course").value = "";
+
   loadStudents();
 }
 
@@ -120,15 +124,15 @@ async function loadStudents() {
 
   let html = "";
 
-  for (let d of data) {
-    html += `
-      <tr>
-        <td>${d.id}</td>
-        <td>${d.name}</td>
-        <td>${d.email}</td>
-        <td>${d.course}</td>
-      </tr>
-    `;
+  for (let i = 0; i < data.length; i++) {
+    const d = data[i];
+
+    html += "<tr>" +
+      "<td>" + d.id + "</td>" +
+      "<td>" + d.name + "</td>" +
+      "<td>" + d.email + "</td>" +
+      "<td>" + d.course + "</td>" +
+    "</tr>";
   }
 
   document.getElementById("data").innerHTML = html;
