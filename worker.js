@@ -9,24 +9,81 @@ export default {
       "Access-Control-Allow-Headers": "Content-Type"
     };
 
-    // Handle CORS
+    // CORS
     if (request.method === "OPTIONS") {
       return new Response(null, { headers });
     }
 
-    // -----------------------------
-    // SERVE FRONTEND (index page)
-    // -----------------------------
+    // -------------------------
+    // FRONTEND PAGE (INDEX)
+    // -------------------------
     if (url.pathname === "/") {
       return new Response(`
 <!DOCTYPE html>
 <html>
 <head>
   <title>Student Form</title>
+  <style>
+    body { font-family: Arial; background:#f5f5f5; padding:30px; }
+    .box { max-width:600px; margin:auto; background:white; padding:20px; border-radius:10px; }
+    input, button { width:100%; padding:10px; margin:5px 0; }
+    button { background:#2563eb; color:white; border:none; cursor:pointer; }
+    table { width:100%; margin-top:20px; border-collapse: collapse; }
+    th, td { border:1px solid #ddd; padding:8px; }
+    th { background:#2563eb; color:white; }
+  </style>
 </head>
 <body>
-  <h1>Student Form is Running 🚀</h1>
-  <p>Now API is working. Connect frontend later if needed.</p>
+
+<div class="box">
+  <h2>Student Form</h2>
+
+  <input id="name" placeholder="Name">
+  <input id="email" placeholder="Email">
+  <input id="course" placeholder="Course">
+  <button onclick="save()">Save</button>
+
+  <h3>Records</h3>
+  <table>
+    <thead>
+      <tr>
+        <th>ID</th><th>Name</th><th>Email</th><th>Course</th>
+      </tr>
+    </thead>
+    <tbody id="data"></tbody>
+  </table>
+</div>
+
+<script>
+const API = "/api/students";
+
+async function save() {
+  await fetch(API, {
+    method: "POST",
+    headers: {"Content-Type":"application/json"},
+    body: JSON.stringify({
+      name: document.getElementById("name").value,
+      email: document.getElementById("email").value,
+      course: document.getElementById("course").value
+    })
+  });
+
+  load();
+}
+
+async function load() {
+  const res = await fetch(API);
+  const data = await res.json();
+
+  document.getElementById("data").innerHTML =
+    data.map(d =>
+      `<tr><td>${d.id}</td><td>${d.name}</td><td>${d.email}</td><td>${d.course}</td></tr>`
+    ).join("");
+}
+
+load();
+</script>
+
 </body>
 </html>
       `, {
@@ -34,29 +91,25 @@ export default {
       });
     }
 
-    // -----------------------------
+    // -------------------------
     // GET STUDENTS
-    // -----------------------------
+    // -------------------------
     if (url.pathname === "/api/students" && request.method === "GET") {
-      const { results } = await env.DB.prepare(
-        "SELECT * FROM students"
-      ).all();
-
+      const { results } = await env.DB.prepare("SELECT * FROM students").all();
       return Response.json(results, { headers });
     }
 
-    // -----------------------------
-    // POST STUDENTS
-    // -----------------------------
+    // -------------------------
+    // ADD STUDENT
+    // -------------------------
     if (url.pathname === "/api/students" && request.method === "POST") {
-
       const body = await request.json();
 
       await env.DB.prepare(
         "INSERT INTO students (name, email, course) VALUES (?, ?, ?)"
       ).bind(body.name, body.email, body.course).run();
 
-      return Response.json({ message: "Saved" }, { headers });
+      return Response.json({ success: true }, { headers });
     }
 
     return new Response("Not Found", { status: 404 });
