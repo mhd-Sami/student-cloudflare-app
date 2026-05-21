@@ -98,10 +98,8 @@ export default {
 </div>
 
 <script>
-
 const API = "/api/students";
 
-// Save student
 async function saveStudent() {
   await fetch(API, {
     method: "POST",
@@ -116,26 +114,27 @@ async function saveStudent() {
   loadStudents();
 }
 
-// Load students
 async function loadStudents() {
   const res = await fetch(API);
   const data = await res.json();
 
-  document.getElementById("data").innerHTML =
-    data.map(d => {
-      return `
-        <tr>
-          <td>${d.id}</td>
-          <td>${d.name}</td>
-          <td>${d.email}</td>
-          <td>${d.course}</td>
-        </tr>
-      `;
-    }).join("");
+  let html = "";
+
+  for (let d of data) {
+    html += `
+      <tr>
+        <td>${d.id}</td>
+        <td>${d.name}</td>
+        <td>${d.email}</td>
+        <td>${d.course}</td>
+      </tr>
+    `;
+  }
+
+  document.getElementById("data").innerHTML = html;
 }
 
 loadStudents();
-
 </script>
 
 </body>
